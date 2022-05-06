@@ -12,7 +12,6 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	player: undefined
 }
 
-
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
