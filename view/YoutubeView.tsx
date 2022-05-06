@@ -2,32 +2,32 @@ import { ItemView, WorkspaceLeaf } from 'obsidian';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { YTContainer } from "../YTContainer"
+import { YouTubePlayer } from 'react-youtube';
 
-export const VIEW_TYPE_EXAMPLE = "example-view";
-export class ExampleView extends ItemView {
+export const YOUTUBE_VIEW = "example-view";
+export class YoutubeView extends ItemView {
 	component: ReactDOM.Renderer
 	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);
 	}
 
 	getViewType() {
-		return VIEW_TYPE_EXAMPLE;
+		return YOUTUBE_VIEW;
 	}
 
 	getDisplayText() {
 		return "Example view";
 	}
 
-	setEphemeralState({ uri, time, insertTimestamp }: { uri: string, time: { obj: number; button: HTMLButtonElement }, insertTimestamp: (ytTime: number) => void }) {
-		console.log('hhh', insertTimestamp)
+	setEphemeralState({ url, setupPlayer }: { url: string, setupPlayer: (yt: YouTubePlayer) => void }) {
+		console.log('hhh', setupPlayer)
 		ReactDOM.render(
 			// @ts-ignore
 			// <AppContext.Provider value={this.app}>
-			<YTContainer uri={uri} time={time} insertTimestamp={insertTimestamp} />,
+			<YTContainer url={url} setupPlayer={setupPlayer} />,
 			// </AppContext.Provider>,
 			this.containerEl.children[1]
 		);
-		console.log('object', this.containerEl.children[1]);
 	}
 
 	async onOpen() {
