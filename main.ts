@@ -210,7 +210,7 @@ class YoutubeTimestampPluginSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Title')
-			.setDesc('This title will be printed after opening a YouTube video with the hotekey. Use <br> for new lines.')
+			.setDesc('This title will be printed after opening a YouTube video with the hotkey. Use <br> for new lines.')
 			.addText(text => text
 				.setPlaceholder('Enter title template.')
 				.setValue(this.plugin.settings.mySetting)
