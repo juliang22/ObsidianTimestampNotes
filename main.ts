@@ -2,18 +2,18 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { YoutubeView, YOUTUBE_VIEW } from './view/YoutubeView';
 import { YouTubePlayer } from 'react-youtube';
 
-interface MyPluginSettings {
+interface YoutubeTimestampPluginSettings {
 	mySetting: string;
 	player: YouTubePlayer;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: YoutubeTimestampPluginSettings = {
 	mySetting: "",
 	player: undefined
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class YoutubeTimestampPlugin extends Plugin {
+	settings: YoutubeTimestampPluginSettings;
 
 	// Helper function to validate url and activate view
 	validateURL = (url: string) => {
@@ -48,27 +48,25 @@ export default class MyPlugin extends Plugin {
 
 		// Markdown processor that turns timestamps into buttons
 		this.registerMarkdownCodeBlockProcessor("yt", (source, el, ctx) => {
+			// Match mm:ss or hh:mm:ss timestamp format
 			const regExp = /\d+:\d+:\d+|\[\d+:\d+\]/g;
 			const rows = source.split("\n").filter((row) => row.length > 0);
 			rows.forEach((row) => {
 				const match = row.match(regExp);
-				if (match) {
+				if (match) { //create button for each timestamp
 					const div = el.createEl("div");
 					const button = div.createEl("button");
-
 					button.innerText = match[0];
+
+					// convert timestamp to seconds and seek to that position when clicked
 					button.addEventListener("click", () => {
 						const hhmmss = match[0].replace(/\[|\]/g, "");
-						//convert hhmmss format to seconds where there might not be hh
 						const timeArr = hhmmss.split(":").map((v) => parseInt(v));
 						const [hh, mm, ss] = timeArr.length === 2 ? [0, ...timeArr] : timeArr;
 						const seconds = (hh || 0) * 3600 + (mm || 0) * 60 + (ss || 0);
 						this.settings.player.seekTo(seconds);
 					});
 					div.appendChild(button);
-				} else {
-					const text = el.createEl("div");
-					text.innerHTML = row;
 				}
 			})
 		});
@@ -107,16 +105,13 @@ export default class MyPlugin extends Plugin {
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new YoutubeSettingTab(this.app, this));
+		this.addSettingTab(new YoutubeTimestampPluginSettingTab(this.app, this));
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
 		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
 			console.log('click', evt);
 		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	onunload() {
@@ -198,10 +193,10 @@ export class YoutubeModal extends Modal {
 	}
 }
 
-class YoutubeSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+class YoutubeTimestampPluginSettingTab extends PluginSettingTab {
+	plugin: YoutubeTimestampPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: YoutubeTimestampPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -215,7 +210,7 @@ class YoutubeSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Title')
-			.setDesc('This will be printed after selecting each video.')
+			.setDesc('This title will be printed after opening a YouTube video with the hotekey. Use <br> for new lines.')
 			.addText(text => text
 				.setPlaceholder('Enter title template.')
 				.setValue(this.plugin.settings.mySetting)
