@@ -25,3 +25,7 @@ https://user-images.githubusercontent.com/39292521/167230491-f5439a62-a3f7-445c-
 ## Known Issues
 1. Inserting timestamps into a bulleted section does not work. Unfortunately, code-blocks cannot be in-line with text. Make sure to press enter/insert the timestamp on a new line.
 
+
+# Other Authors
+This plugin uses the react-youtube npm package: https://www.npmjs.com/package/react-youtube.
+
