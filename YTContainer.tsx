@@ -3,7 +3,6 @@ import { useState } from 'react';
 import YouTube, { YouTubeProps, YouTubePlayer } from 'react-youtube';
 
 export const YTContainer = ({ url, setupPlayer }: { url: string, setupPlayer: (yt: YouTubePlayer) => void }): JSX.Element => {
-	// @ts-ignore
 	const [options] = useState<YouTubeProps['opts']>({
 		height: '410',
 		width: '100%',
@@ -19,7 +18,6 @@ export const YTContainer = ({ url, setupPlayer }: { url: string, setupPlayer: (y
 		setupPlayer(event.target)
 	}
 
-	console.log('ggg', setupPlayer)
 	return (
 		// @ts-ignore
 		<YouTube

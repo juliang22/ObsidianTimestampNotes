@@ -20,7 +20,6 @@ export class YoutubeView extends ItemView {
 	}
 
 	setEphemeralState({ url, setupPlayer }: { url: string, setupPlayer: (yt: YouTubePlayer) => void }) {
-		console.log('hhh', setupPlayer)
 		ReactDOM.render(
 			// @ts-ignore
 			// <AppContext.Provider value={this.app}>

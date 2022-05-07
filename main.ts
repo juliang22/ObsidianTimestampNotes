@@ -39,7 +39,7 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 
 		// Create ribbon button that opens modal to use for inserting YouTube url
-		this.addRibbonIcon("note-glyph", "Youtube Timestamp Notes", () => {
+		this.addRibbonIcon("clock", "Youtube Timestamp Notes", () => {
 			new YoutubeModal(this.app, async (result) => {
 				new Notice(`Opening, ${result}!`)
 				await this.validateURL(result.trim());
@@ -75,8 +75,8 @@ export default class MyPlugin extends Plugin {
 
 		// Command that gets selected youtube link and sends it to view which passes it to React component
 		this.addCommand({
-			id: 'trigger-youtube-view',
-			name: 'Trigger Youtube View (copy youtube url and use hotkey)',
+			id: 'trigger-youtube-player',
+			name: 'Open Youtube Player (copy youtube url and use hotkey)',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				// Get selected text and match against youtube url to convert link to youtube video id
 				const url = editor.getSelection().trim();

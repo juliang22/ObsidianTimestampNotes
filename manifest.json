@@ -3,8 +3,8 @@
 	"name": "YouTube Timestamp Notes",
 	"version": "1.0.1",
 	"minAppVersion": "0.12.0",
-	"description": "This plugin allows side-by-side notetaking with YouTube videos. Annotate your notes with timestamps to directly control the video and remember where in the video each note comes from.",
+	"description": "This plugin allows side-by-side notetaking with YouTube videos. Annotate your notes with timestamps to directly control the video and remember where each note comes from.",
 	"author": "Julian Grunauer",
-	"authorUrl": "https://obsidian.md",
+	"authorUrl": "https://github.com/juliang22/ObsidianYoutubeTimestampNotes",
 	"isDesktopOnly": true
 }
