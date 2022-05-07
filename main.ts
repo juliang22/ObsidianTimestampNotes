@@ -5,16 +5,19 @@ import { YouTubePlayer } from 'react-youtube';
 interface YoutubeTimestampPluginSettings {
 	mySetting: string;
 	player: YouTubePlayer;
+	urlStartTimeMap: Map<string, number>;
+	currURL: string;
 }
 
 const DEFAULT_SETTINGS: YoutubeTimestampPluginSettings = {
 	mySetting: "",
-	player: undefined
+	player: undefined,
+	urlStartTimeMap: new Map<string, number>(),
+	currURL: undefined,
 }
 
 export default class YoutubeTimestampPlugin extends Plugin {
 	settings: YoutubeTimestampPluginSettings;
-
 	// Helper function to validate url and activate view
 	validateURL = (url: string) => {
 		const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
@@ -75,7 +78,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 			id: 'trigger-youtube-player',
 			name: 'Open Youtube Player (copy youtube url and use hotkey)',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				// Get selected text and match against youtube url to convert link to youtube video id
+				// Get selected text and match against youtube url to convert link to youtube video id => also triggers activateView in validateURL
 				const url = editor.getSelection().trim();
 				editor.replaceSelection(editor.getSelection() + "\n" + this.validateURL(url));
 				editor.setCursor(editor.getCursor().line + 1)
@@ -126,8 +129,15 @@ export default class YoutubeTimestampPlugin extends Plugin {
 		});
 	}
 
-	onunload() {
+	async onunload() {
+		if (this.settings.player) {
+			this.settings.player.destroy();
+		}
+
+		this.settings.player = null;
+		this.settings.currURL = null;
 		this.app.workspace.detachLeavesOfType(YOUTUBE_VIEW);
+		await this.saveSettings();
 	}
 
 	// This is called when a valid url is found => it activates the View which loads the React view
@@ -144,6 +154,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 		);
 
 
+		this.settings.currURL = url;
 		// This triggers the React component to be loaded
 		this.app.workspace.getLeavesOfType(YOUTUBE_VIEW).forEach(async (leaf) => {
 			if (leaf.view instanceof YoutubeView) {
@@ -151,14 +162,28 @@ export default class YoutubeTimestampPlugin extends Plugin {
 				const setupPlayer = (yt: YouTubePlayer) => {
 					this.settings.player = yt;
 				}
-				leaf.setEphemeralState({ url, setupPlayer });
+
+				const saveTimeOnUnload = async () => {
+					if (this.settings.player) {
+						this.settings.urlStartTimeMap.set(this.settings.currURL, this.settings.player.getCurrentTime().toFixed(0));
+					}
+					await this.saveSettings();
+				}
+
+				// create a new YoutubeView instance, sets up state/unload functionality, and passes in a start time if available else 0
+				leaf.setEphemeralState({ url, setupPlayer, saveTimeOnUnload, start: ~~this.settings.urlStartTimeMap.get(url) });
+
 				await this.saveSettings();
 			}
 		});
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		// Fix for a weird bug that turns default map into a normal object when loaded
+		const data = await this.loadData()
+		const map = new Map(Object.keys(data.urlStartTimeMap).map(k => [k, data.urlStartTimeMap[k]]))
+
+		this.settings = { ...DEFAULT_SETTINGS, ...data, urlStartTimeMap: map };
 	}
 
 

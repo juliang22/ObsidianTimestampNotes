@@ -1,14 +1,23 @@
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { YTContainer } from "../YTContainer"
-import { YouTubePlayer } from 'react-youtube';
+import { createRoot, Root } from 'react-dom/client';
+
+import { YTContainer, YTContainerProps } from "../YTContainer"
+
+export interface YTViewProps extends YTContainerProps {
+	saveTimeOnUnload: () => void;
+}
 
 export const YOUTUBE_VIEW = "example-view";
 export class YoutubeView extends ItemView {
 	component: ReactDOM.Renderer
+	saveTimeOnUnload: () => void
+	root: Root
 	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);
+		this.saveTimeOnUnload = () => { };
+		this.root = createRoot(this.containerEl.children[1])
 	}
 
 	getViewType() {
@@ -19,14 +28,13 @@ export class YoutubeView extends ItemView {
 		return "Example view";
 	}
 
-	setEphemeralState({ url, setupPlayer }: { url: string, setupPlayer: (yt: YouTubePlayer) => void }) {
-		ReactDOM.render(
-			// @ts-ignore
-			// <AppContext.Provider value={this.app}>
-			<YTContainer url={url} setupPlayer={setupPlayer} />,
-			// </AppContext.Provider>,
-			this.containerEl.children[1]
-		);
+	setEphemeralState({ url, setupPlayer, saveTimeOnUnload, start }: YTViewProps) {
+
+		// Allows view to save the playback time in the setting state when the view is closed 
+		this.saveTimeOnUnload = saveTimeOnUnload;
+
+		// Create a root element for the view to render into
+		this.root.render(<YTContainer url={url} setupPlayer={setupPlayer} start={start} />);
 	}
 
 	async onOpen() {
@@ -34,6 +42,8 @@ export class YoutubeView extends ItemView {
 	}
 
 	async onClose() {
+		if (this.saveTimeOnUnload) await this.saveTimeOnUnload();
+		this.root.unmount()
 		ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
 	}
 }

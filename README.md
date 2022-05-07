@@ -15,8 +15,9 @@ This plugin solves this issue by allowing you to:
 - Set the hotkeys for opening the YouTube Player and inserting timestamps (my default is cmnd-shift-y and cmnd-y, respectively)
 - Highlight a YouTube url and select either the Ribbon note icon or the Open YouTube Player hotkey
 - Jot down notes and anytime you want to insert a timestamp, press the registered hotkey
-- Toggle pause the player by using hotkey (my default is option space)
-- Close the player by right-clicking the icon above the YouTube player and selecting close
+- Toggle pausing/playing the video by using hotkey (my default is option space)
+- Open videos at the timestamp you left off on (this is reset if plugin is disabled)
+- Close the player by right-clicking the icon above the YouTube player and selecting close 
 
 ## Demo
 
