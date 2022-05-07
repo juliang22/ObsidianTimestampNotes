@@ -49,7 +49,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 		// Markdown processor that turns timestamps into buttons
 		this.registerMarkdownCodeBlockProcessor("yt", (source, el, ctx) => {
 			// Match mm:ss or hh:mm:ss timestamp format
-			const regExp = /\d+:\d+:\d+|\[\d+:\d+\]/g;
+			const regExp = /\d+:\d+:\d+|\d+:\d+/g;
 			const rows = source.split("\n").filter((row) => row.length > 0);
 			rows.forEach((row) => {
 				const match = row.match(regExp);
@@ -60,8 +60,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 
 					// convert timestamp to seconds and seek to that position when clicked
 					button.addEventListener("click", () => {
-						const hhmmss = match[0].replace(/\[|\]/g, "");
-						const timeArr = hhmmss.split(":").map((v) => parseInt(v));
+						const timeArr = match[0].split(":").map((v) => parseInt(v));
 						const [hh, mm, ss] = timeArr.length === 2 ? [0, ...timeArr] : timeArr;
 						const seconds = (hh || 0) * 3600 + (mm || 0) * 60 + (ss || 0);
 						this.settings.player.seekTo(seconds);
@@ -92,15 +91,28 @@ export default class YoutubeTimestampPlugin extends Plugin {
 					editor.replaceSelection("A video needs to be opened before using this hotkey. Highlight your youtube link and input your preffered hotkey to register a video.")
 				}
 
+				const leadingZero = (num: number) => num < 10 ? "0" + num.toFixed(0) : num.toFixed(0);
+
 				// convert current YouTube time into timestamp
 				const totalSeconds = this.settings.player.getCurrentTime().toFixed(2);
 				const hours = Math.floor(totalSeconds / 3600);
 				const minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
 				const seconds = totalSeconds - (hours * 3600) - (minutes * 60);
-				const time = (hours > 0 ? hours.toFixed(0) + ":" : "") + minutes.toFixed(0) + ":" + seconds.toFixed(0);
+				const time = (hours > 0 ? leadingZero(hours) + ":" : "") + leadingZero(minutes) + ":" + leadingZero(seconds);
 
 				// insert timestamp into editor
-				editor.replaceSelection("```yt \n [" + time + "] \n ```\n")
+				editor.replaceSelection("```yt \n " + time + "\n ```\n")
+			}
+		});
+
+		// Command that pauses YouTube Video
+		this.addCommand({
+			id: 'pause-youtube-player',
+			name: 'Pause YouTube player',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.settings.player.getPlayerState() == 2 ?
+					this.settings.player.playVideo() :
+					this.settings.player.pauseVideo();
 			}
 		});
 
