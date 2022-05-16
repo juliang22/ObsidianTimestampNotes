@@ -28,7 +28,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 			this.activateView(match[7].toString().trim());
 			return "\n" + this.settings.mySetting
 		}
-		return "\n The copied link is not a valid youtube url. Please try again with a valid link.\n"
+		return "\n The highlighted link is not a valid YouTube url. Please try again with a valid link.\n"
 	}
 
 	async onload() {
