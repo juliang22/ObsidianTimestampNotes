@@ -124,9 +124,9 @@ export default class YoutubeTimestampPlugin extends Plugin {
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
+		// this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
+		// 	console.log('click', evt);
+		// });
 	}
 
 	async onunload() {
@@ -181,9 +181,12 @@ export default class YoutubeTimestampPlugin extends Plugin {
 	async loadSettings() {
 		// Fix for a weird bug that turns default map into a normal object when loaded
 		const data = await this.loadData()
-		const map = new Map(Object.keys(data.urlStartTimeMap).map(k => [k, data.urlStartTimeMap[k]]))
-
-		this.settings = { ...DEFAULT_SETTINGS, ...data, urlStartTimeMap: map };
+		if (data) {
+			const map = new Map(Object.keys(data.urlStartTimeMap).map(k => [k, data.urlStartTimeMap[k]]))
+			this.settings = { ...DEFAULT_SETTINGS, ...data, urlStartTimeMap: map };
+		} else {
+			this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		}
 	}
 
 

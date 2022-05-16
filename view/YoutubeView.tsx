@@ -47,17 +47,3 @@ export class YoutubeView extends ItemView {
 		ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
 	}
 }
-
-/* 
-PLAN:
-- User highlights link string and activates via command
-- call activateView method to open view in right leaf and call setter method to send link to view 
-- From view,
-
-
-Need a way to get timestamps to view (user clicks on [0:25] and it sends it to view)
-Need a way for view to send back timestamps to md file (user presses command and it pastes[0:25] into md file)
-
-- 
-
-*/
