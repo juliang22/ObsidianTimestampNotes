@@ -6,7 +6,7 @@ on:
       - "*"
 
 env:
-  PLUGIN_NAME: obsidian-youtube-timestamp-notes
+  PLUGIN_NAME: obsidian-timestamp-notes
 
 jobs:
   build:

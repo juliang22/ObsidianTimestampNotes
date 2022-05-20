@@ -1,14 +1,14 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { YoutubeView, YOUTUBE_VIEW } from './view/YoutubeView';
+import { VideoView, VIDEO_VIEW } from './view/VideoView';
 
 import ReactPlayer from 'react-player/lazy'
 
-interface YoutubeTimestampPluginSettings {
+interface TimestampPluginSettings {
 	noteTitle: string;
 	urlStartTimeMap: Map<string, number>;
 }
 
-const DEFAULT_SETTINGS: YoutubeTimestampPluginSettings = {
+const DEFAULT_SETTINGS: TimestampPluginSettings = {
 	noteTitle: "",
 	urlStartTimeMap: new Map<string, number>()
 }
@@ -19,10 +19,10 @@ const ERRORS: { [key: string]: string } = {
 	"STREAMING_ERROR": "\n> [!error] Streaming Error \n> Video is unplayable. This could be due to privacy settings, streaming permissions, or invalid url.\n"
 }
 
-export default class YoutubeTimestampPlugin extends Plugin {
-	settings: YoutubeTimestampPluginSettings;
+export default class TimestampPlugin extends Plugin {
+	settings: TimestampPluginSettings;
 	player: ReactPlayer;
-	error: string;
+	setPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 	// Helper function to validate url and activate view
 	validateURL = (url: string) => {
 		url = url.trim();
@@ -34,16 +34,16 @@ export default class YoutubeTimestampPlugin extends Plugin {
 	async onload() {
 		// Register view
 		this.registerView(
-			YOUTUBE_VIEW,
-			(leaf) => new YoutubeView(leaf)
+			VIDEO_VIEW,
+			(leaf) => new VideoView(leaf)
 		);
 
 		// Register settings
 		await this.loadSettings();
 
-		// Create ribbon button that opens modal to use for inserting YouTube url
-		this.addRibbonIcon("clock", "Youtube Timestamp Notes", () => {
-			new YoutubeModal(this.app, async (url) => {
+		// Create ribbon button that opens modal to use for inserting video url
+		this.addRibbonIcon("clock", "Timestamp Notes", () => {
+			new SetupVideoModal(this.app, async (url) => {
 				new Notice(`Opening, ${url}!`)
 				this.validateURL(url);
 				// Activate the view with the valid link
@@ -75,12 +75,12 @@ export default class YoutubeTimestampPlugin extends Plugin {
 			})
 		});
 
-		// Command that gets selected youtube link and sends it to view which passes it to React component
+		// Command that gets selected video link and sends it to view which passes it to React component
 		this.addCommand({
-			id: 'trigger-youtube-player',
-			name: 'Open Video Player (copy youtube url and use hotkey)',
+			id: 'trigger-player',
+			name: 'Open Video Player (copy video url and use hotkey)',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				// Get selected text and match against youtube url to convert link to youtube video id => also triggers activateView in validateURL
+				// Get selected text and match against video url to convert link to video video id => also triggers activateView in validateURL
 				const url = editor.getSelection().trim();
 				editor.replaceSelection(editor.getSelection() + "\n" + this.validateURL(url));
 
@@ -102,7 +102,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 
 				const leadingZero = (num: number) => num < 10 ? "0" + num.toFixed(0) : num.toFixed(0);
 
-				// convert current YouTube time into timestamp
+				// convert current video time into timestamp
 				const totalSeconds = Number(this.player.getCurrentTime().toFixed(2));
 				const hours = Math.floor(totalSeconds / 3600);
 				const minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
@@ -116,42 +116,43 @@ export default class YoutubeTimestampPlugin extends Plugin {
 
 		//Command that play/pauses the video
 		this.addCommand({
-			id: 'pause-youtube-player',
-			name: 'Pause YouTube player',
+			id: 'pause-player',
+			name: 'Pause player',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				this.player.props.togglePlaying();
+				this.setPlaying(!this.player.props.playing)
 			}
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new YoutubeTimestampPluginSettingTab(this.app, this));
+		this.addSettingTab(new TimestampPluginSettingTab(this.app, this));
 	}
 
 	async onunload() {
 		this.player = null;
-		this.app.workspace.detachLeavesOfType(YOUTUBE_VIEW);
+		this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
 	}
 
 	// This is called when a valid url is found => it activates the View which loads the React view
 	async activateView(url: string, editor: Editor = null) {
-		this.app.workspace.detachLeavesOfType(YOUTUBE_VIEW);
+		this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
 
 		await this.app.workspace.getRightLeaf(false).setViewState({
-			type: YOUTUBE_VIEW,
+			type: VIDEO_VIEW,
 			active: true,
 		});
 
 		this.app.workspace.revealLeaf(
-			this.app.workspace.getLeavesOfType(YOUTUBE_VIEW)[0]
+			this.app.workspace.getLeavesOfType(VIDEO_VIEW)[0]
 		);
 
 
 		// This triggers the React component to be loaded
-		this.app.workspace.getLeavesOfType(YOUTUBE_VIEW).forEach(async (leaf) => {
-			if (leaf.view instanceof YoutubeView) {
+		this.app.workspace.getLeavesOfType(VIDEO_VIEW).forEach(async (leaf) => {
+			if (leaf.view instanceof VideoView) {
 
-				const setupPlayer = (player: ReactPlayer) => {
+				const setupPlayer = (player: ReactPlayer, setPlaying: React.Dispatch<React.SetStateAction<boolean>>) => {
 					this.player = player;
+					this.setPlaying = setPlaying;
 				}
 
 				const setupError = () => {
@@ -165,7 +166,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 					await this.saveSettings();
 				}
 
-				// create a new YoutubeView instance, sets up state/unload functionality, and passes in a start time if available else 0
+				// create a new video instance, sets up state/unload functionality, and passes in a start time if available else 0
 				leaf.setEphemeralState({
 					url,
 					setupPlayer,
@@ -196,7 +197,7 @@ export default class YoutubeTimestampPlugin extends Plugin {
 	}
 }
 
-export class YoutubeModal extends Modal {
+export class SetupVideoModal extends Modal {
 	result: string;
 	onSubmit: (result: string) => void;
 
@@ -208,7 +209,7 @@ export class YoutubeModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 
-		contentEl.createEl("h1", { text: "Insert YouTube url " });
+		contentEl.createEl("h1", { text: "Insert video url " });
 
 		new Setting(contentEl)
 			.setName("Link")
@@ -234,10 +235,10 @@ export class YoutubeModal extends Modal {
 	}
 }
 
-class YoutubeTimestampPluginSettingTab extends PluginSettingTab {
-	plugin: YoutubeTimestampPlugin;
+class TimestampPluginSettingTab extends PluginSettingTab {
+	plugin: TimestampPlugin;
 
-	constructor(app: App, plugin: YoutubeTimestampPlugin) {
+	constructor(app: App, plugin: TimestampPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -247,11 +248,11 @@ class YoutubeTimestampPluginSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'Youtube Notes Plugin' });
+		containerEl.createEl('h2', { text: 'Timestamp Notes Plugin' });
 
 		new Setting(containerEl)
 			.setName('Title')
-			.setDesc('This title will be printed after opening a YouTube video with the hotkey. Use <br> for new lines.')
+			.setDesc('This title will be printed after opening a video with the hotkey. Use <br> for new lines.')
 			.addText(text => text
 				.setPlaceholder('Enter title template.')
 				.setValue(this.plugin.settings.noteTitle)

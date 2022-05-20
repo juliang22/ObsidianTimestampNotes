@@ -4,14 +4,14 @@ import { useRef, useState } from 'react';
 import ReactPlayer from 'react-player/lazy'
 
 
-export interface YTContainerProps {
+export interface VideoContainerProps {
 	url: string;
 	start: number
-	setupPlayer: (player: ReactPlayer) => void;
+	setupPlayer: (player: ReactPlayer, setPlaying: React.Dispatch<React.SetStateAction<boolean>>) => void;
 	setupError: () => void;
 }
 
-export const YTContainer = ({ url, setupPlayer, start, setupError }: YTContainerProps): JSX.Element => {
+export const VideoContainer = ({ url, setupPlayer, start, setupError }: VideoContainerProps): JSX.Element => {
 	// Reference to player passed back to the setupPlayer prop
 	const playerRef = useRef<ReactPlayer>();
 
@@ -22,15 +22,17 @@ export const YTContainer = ({ url, setupPlayer, start, setupError }: YTContainer
 		if (start) playerRef.current.seekTo(start);
 
 		// Sets up video player to be accessed in main.ts
-		if (playerRef) setupPlayer(playerRef.current);
+		if (playerRef) setupPlayer(playerRef.current, setPlaying);
 	}
+
+
 
 	return (
 		<ReactPlayer
 			ref={playerRef}
 			url={url}
 			playing={playing}
-			togglePlaying={() => setPlaying(!playing)}
+			//toggleplaying={(tmp: number) => setPlaying(!playing)}
 			controls={true}
 			width='100%'
 			height='40%'

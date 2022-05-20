@@ -20,6 +20,6 @@
   },
   "include": [
     "**/*.ts",
-    "view/YoutubeView.tsx"
+    "view/VideoView.tsx"
   ]
 }
