@@ -10,10 +10,18 @@ This plugin solves this issue by allowing you to:
 - Insert timestamps with a hotkey
 - Select timestamps to navigate to that place in the video
 
-## Usage
+## Setup 
 - Download and enable the plugin
-- Set the hotkeys for opening the video Player and inserting timestamps (my default is cmnd-shift-y and cmnd-y, respectively)
-- Highlight a video url and select either the Ribbon note icon or the 'Open Video Player' hotkey
+- Set the hotkeys for
+  - opening the video player (my default is cmnd-shift-y)
+  - inserting timestamps (my default is cmnd-y)
+  - playing/pausing video (my default is cntrl-space)
+- Set options for
+  - colors of the url, url text, timestamp button, and timestamp text
+  - Title that is pasted when 'Open Video Player' hotkey is used
+
+## Usage
+- Highlight a video url and select either the Ribbon clock icon or use the 'Open Video Player' hotkey
 - Jot down notes and anytime you want to insert a timestamp, press the registered hotkey
 - Toggle pausing/playing the video by using hotkey (my default is option space)
 - Open videos at the timestamp you left off on (this is reset if plugin is disabled)
@@ -37,6 +45,7 @@ https://user-images.githubusercontent.com/39292521/167230491-f5439a62-a3f7-445c-
 
 ## Known Issues
 1. Inserting timestamps into a bulleted section does not work. Unfortunately, code-blocks cannot be in-line with text. Make sure to press enter/insert the timestamp on a new line.
+2. If you decide to change the colors of your buttons/text, any old buttons/text will not update with the new colors until you reload the app. You can also click the '<>' when hovering over the code-block and it will refresh with the new colors.
 
 
 ## Other Authors

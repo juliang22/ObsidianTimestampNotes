@@ -8,7 +8,7 @@ export interface VideoContainerProps {
 	url: string;
 	start: number
 	setupPlayer: (player: ReactPlayer, setPlaying: React.Dispatch<React.SetStateAction<boolean>>) => void;
-	setupError: () => void;
+	setupError: (err: string) => void;
 }
 
 export const VideoContainer = ({ url, setupPlayer, start, setupError }: VideoContainerProps): JSX.Element => {
@@ -37,7 +37,7 @@ export const VideoContainer = ({ url, setupPlayer, start, setupError }: VideoCon
 			width='100%'
 			height='40%'
 			onReady={onReady}
-			onError={setupError} // Error handling for invalid URLs
+			onError={(err) => setupError(err ? err.message : "Video is unplayable due to privacy settings, streaming permissions, etc.  ")} // Error handling for invalid URLs
 		/>
 	)
 };

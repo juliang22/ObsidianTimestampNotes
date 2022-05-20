@@ -1,7 +1,7 @@
 {
-	"name": "youtube-timestamp-note",
+	"name": "obsidian-timestamp-notes",
 	"version": "1.0.5",
-	"description": "This plugin allows side-by-side notetaking with YouTube videos. Annotate your notes with timestamps to directly control the video and remember where each note comes from.",
+	"description": "This plugin allows side-by-side notetaking with videos. Annotate your notes with timestamps to directly control the video and remember where each note comes from.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
@@ -24,7 +24,6 @@
 		"typescript": "4.4.4"
 	},
 	"dependencies": {
-		"@types/react-youtube": "^7.10.0",
 		"preact": "^8.5.3",
 		"preact-compat": "^3.19.0",
 		"react": "^18.1.0",
