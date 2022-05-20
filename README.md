@@ -29,5 +29,5 @@ https://user-images.githubusercontent.com/39292521/167230491-f5439a62-a3f7-445c-
 
 
 ## Other Authors
-This plugin uses the react-youtube npm package: https://www.npmjs.com/package/react-youtube.
+This plugin uses the react-player npm package: https://www.npmjs.com/package/react-player.
 

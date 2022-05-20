@@ -3,7 +3,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { createRoot, Root } from 'react-dom/client';
 
-import { YTContainer, YTContainerProps } from "../YTContainer"
+import { YTContainer, YTContainerProps } from "./YTContainer"
 
 export interface YTViewProps extends YTContainerProps {
 	saveTimeOnUnload: () => void;
@@ -25,20 +25,23 @@ export class YoutubeView extends ItemView {
 	}
 
 	getDisplayText() {
-		return "Example view";
+		return "YouTube view";
 	}
 
-	setEphemeralState({ url, setupPlayer, saveTimeOnUnload, start }: YTViewProps) {
+	setEphemeralState({ url, setupPlayer, setupError, saveTimeOnUnload, start }: YTViewProps) {
 
 		// Allows view to save the playback time in the setting state when the view is closed 
 		this.saveTimeOnUnload = saveTimeOnUnload;
 
 		// Create a root element for the view to render into
-		this.root.render(<YTContainer url={url} setupPlayer={setupPlayer} start={start} />);
-	}
-
-	async onOpen() {
-
+		this.root.render(
+			<YTContainer
+				url={url}
+				start={start}
+				setupPlayer={setupPlayer}
+				setupError={setupError}
+			/>
+		);
 	}
 
 	async onClose() {
