@@ -8,7 +8,7 @@ import { SetupVideoModal } from 'ribbonModal';
 
 const ERRORS: { [key: string]: string } = {
 	"INVALID_URL": "\n> [!error] Invalid Video URL\n> The highlighted link is not a valid video url. Please try again with a valid link.\n",
-	"NO_ACTIVE_VIDEO": "\n> [!caution] Select Video\n> A video needs to be opened before using this hotkey.\n Click the TimestampVideo ribbon icon or highlight your video link and input your 'Open Video Player' hotkey to register a video.\n",
+	"NO_ACTIVE_VIDEO": "\n> [!caution] Select Video\n> A video needs to be opened before using this hotkey.\n Click the TimestampVideo ribbon icon or highlight your video link and input your 'Open video player' hotkey to register a video.\n",
 }
 
 export default class TimestampPlugin extends Plugin {
@@ -97,7 +97,7 @@ export default class TimestampPlugin extends Plugin {
 		// Command that gets selected video link and sends it to view which passes it to React component
 		this.addCommand({
 			id: 'trigger-player',
-			name: 'Open Video Player (copy video url and use hotkey)',
+			name: 'Open video player (copy video url and use hotkey)',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				// Get selected text and match against video url to convert link to video video id => also triggers activateView in validateURL
 				const url = editor.getSelection().trim();
