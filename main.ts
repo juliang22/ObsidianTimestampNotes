@@ -1,14 +1,13 @@
-import { Editor, MarkdownView, Notice, Plugin, } from 'obsidian';
+import { Editor, MarkdownView, Plugin, } from 'obsidian';
 import ReactPlayer from 'react-player/lazy'
 
 import { VideoView, VIDEO_VIEW } from './view/VideoView';
 import { TimestampPluginSettings, TimestampPluginSettingTab, DEFAULT_SETTINGS } from 'settings';
-import { SetupVideoModal } from 'ribbonModal';
 
 
 const ERRORS: { [key: string]: string } = {
 	"INVALID_URL": "\n> [!error] Invalid Video URL\n> The highlighted link is not a valid video url. Please try again with a valid link.\n",
-	"NO_ACTIVE_VIDEO": "\n> [!caution] Select Video\n> A video needs to be opened before using this hotkey.\n Click the TimestampVideo ribbon icon or highlight your video link and input your 'Open video player' hotkey to register a video.\n",
+	"NO_ACTIVE_VIDEO": "\n> [!caution] Select Video\n> A video needs to be opened before using this hotkey.\n Highlight your video link and input your 'Open video player' hotkey to register a video.\n",
 }
 
 export default class TimestampPlugin extends Plugin {
@@ -16,13 +15,6 @@ export default class TimestampPlugin extends Plugin {
 	player: ReactPlayer;
 	setPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 	editor: Editor;
-	// Helper function to validate url and activate view
-	validateURL = (url: string) => {
-		url = url.trim();
-		if (!ReactPlayer.canPlay(url)) return ERRORS["INVALID_URL"];
-		if (this.settings.noteTitle) return "\n" + this.settings.noteTitle
-		return "";
-	}
 
 	async onload() {
 		// Register view
@@ -33,17 +25,6 @@ export default class TimestampPlugin extends Plugin {
 
 		// Register settings
 		await this.loadSettings();
-
-		// Create ribbon button that opens modal to use for inserting video url
-		this.addRibbonIcon("clock", "Timestamp Notes", () => {
-			new SetupVideoModal(this.app, async (url) => {
-				new Notice(`Opening, ${url}!`)
-				this.validateURL(url);
-				// Activate the view with the valid link
-				this.activateView(url);
-				if (this.editor) this.editor.replaceSelection("```timestamp-url \n " + url + "\n ```\n");
-			}).open();
-		});
 
 		// Markdown processor that turns timestamps into buttons
 		this.registerMarkdownCodeBlockProcessor("timestamp", (source, el, ctx) => {
@@ -85,7 +66,7 @@ export default class TimestampPlugin extends Plugin {
 				button.style.color = this.settings.urlTextColor;
 
 				button.addEventListener("click", () => {
-					this.editor ? this.activateView(url, this.editor) : this.activateView(url);
+					this.activateView(url, this.editor);
 				});
 			} else {
 				if (this.editor) {
@@ -99,14 +80,18 @@ export default class TimestampPlugin extends Plugin {
 			id: 'trigger-player',
 			name: 'Open video player (copy video url and use hotkey)',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				// Get selected text and match against video url to convert link to video video id => also triggers activateView in validateURL
+				// Get selected text and match against video url to convert link to video video id
 				const url = editor.getSelection().trim();
 
 				// Activate the view with the valid link
 				if (ReactPlayer.canPlay(url)) {
 					this.activateView(url, editor);
-					editor.replaceSelection("```timestamp-url \n " + url + "\n ```\n");
+					this.settings.noteTitle ?
+						editor.replaceSelection("\n" + this.settings.noteTitle + "\n" + "```timestamp-url \n " + url + "\n ```\n") :
+						editor.replaceSelection("```timestamp-url \n " + url + "\n ```\n")
 					this.editor = editor;
+				} else {
+					editor.replaceSelection(ERRORS["INVALID_URL"])
 				}
 				editor.setCursor(editor.getCursor().line + 1)
 			}
@@ -119,11 +104,11 @@ export default class TimestampPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				if (!this.player) {
 					editor.replaceSelection(ERRORS["NO_ACTIVE_VIDEO"])
+					return
 				}
 
-				const leadingZero = (num: number) => num < 10 ? "0" + num.toFixed(0) : num.toFixed(0);
-
 				// convert current video time into timestamp
+				const leadingZero = (num: number) => num < 10 ? "0" + num.toFixed(0) : num.toFixed(0);
 				const totalSeconds = Number(this.player.getCurrentTime().toFixed(2));
 				const hours = Math.floor(totalSeconds / 3600);
 				const minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
@@ -156,7 +141,7 @@ export default class TimestampPlugin extends Plugin {
 	}
 
 	// This is called when a valid url is found => it activates the View which loads the React view
-	async activateView(url: string, editor: Editor = null) {
+	async activateView(url: string, editor: Editor) {
 		this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
 
 		await this.app.workspace.getRightLeaf(false).setViewState({

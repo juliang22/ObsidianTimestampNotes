@@ -21,7 +21,7 @@ This plugin solves this issue by allowing you to:
   - Title that is pasted when 'Open Video Player' hotkey is used
 
 ## Usage
-- Highlight a video url and select either the Ribbon clock icon or use the 'Open Video Player' hotkey
+- Highlight a video url and use the 'Open Video Player' hotkey
 - Jot down notes and anytime you want to insert a timestamp, press the registered hotkey
 - Toggle pausing/playing the video by using hotkey (my default is option space)
 - Open videos at the timestamp you left off on (this is reset if plugin is disabled)

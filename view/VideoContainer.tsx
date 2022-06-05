@@ -25,8 +25,6 @@ export const VideoContainer = ({ url, setupPlayer, start, setupError }: VideoCon
 		if (playerRef) setupPlayer(playerRef.current, setPlaying);
 	}
 
-
-
 	return (
 		<ReactPlayer
 			ref={playerRef}
@@ -37,7 +35,9 @@ export const VideoContainer = ({ url, setupPlayer, start, setupError }: VideoCon
 			width='100%'
 			height='40%'
 			onReady={onReady}
-			onError={(err) => setupError(err ? err.message : "Video is unplayable due to privacy settings, streaming permissions, etc.  ")} // Error handling for invalid URLs
+			onError={(err) => setupError(err ?
+				err.message :
+				`Video is unplayable due to privacy settings, streaming permissions, etc.`)} // Error handling for invalid URLs
 		/>
 	)
 };

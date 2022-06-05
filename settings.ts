@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS: TimestampPluginSettings = {
 	timestampTextColor: 'white'
 }
 
-const COLORS = { 'blue': 'blue', 'red': 'red', 'green': 'green', 'yellow': 'yellow', 'orange': 'orange', 'purple': 'purple', 'pink': 'pink', 'grey': 'grey', 'black': 'black' }
+const COLORS = { 'blue': 'blue', 'red': 'red', 'green': 'green', 'yellow': 'yellow', 'orange': 'orange', 'purple': 'purple', 'pink': 'pink', 'grey': 'grey', 'black': 'black', 'white': 'white' };
 
 export class TimestampPluginSettingTab extends PluginSettingTab {
 	plugin: TimestampPlugin;

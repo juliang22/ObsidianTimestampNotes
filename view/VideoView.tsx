@@ -25,7 +25,11 @@ export class VideoView extends ItemView {
 	}
 
 	getDisplayText() {
-		return "Video view";
+		return "Timestamp Video";
+	}
+
+	getIcon(): string {
+		return "video";
 	}
 
 	setEphemeralState({ url, setupPlayer, setupError, saveTimeOnUnload, start }: VideoViewProps) {
