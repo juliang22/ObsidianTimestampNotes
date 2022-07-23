@@ -33,7 +33,7 @@ export const VideoContainer = ({ url, setupPlayer, start, setupError }: VideoCon
 			//toggleplaying={(tmp: number) => setPlaying(!playing)}
 			controls={true}
 			width='100%'
-			height='40%'
+			height='100%'
 			onReady={onReady}
 			onError={(err) => setupError(err ?
 				err.message :
