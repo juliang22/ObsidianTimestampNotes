@@ -129,6 +129,24 @@ export default class TimestampPlugin extends Plugin {
 			}
 		});
 
+		// Seek forward by set amount of seconds
+		this.addCommand({
+			id: 'seek-forward',
+			name: 'Seek Forward',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (this.player) this.player.seekTo(this.player.getCurrentTime() + parseInt(this.settings.forwardSeek));
+			}
+		});
+
+		// Seek backwards by set amount of seconds
+		this.addCommand({
+			id: 'seek-backward',
+			name: 'Seek Backward',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (this.player) this.player.seekTo(this.player.getCurrentTime() - parseInt(this.settings.backwardsSeek));
+			}
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new TimestampPluginSettingTab(this.app, this));
 	}
