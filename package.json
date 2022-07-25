@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-timestamp-notes",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "This plugin allows side-by-side notetaking with videos. Annotate your notes with timestamps to directly control the video and remember where each note comes from.",
 	"main": "main.js",
 	"scripts": {
