@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Plugin, } from 'obsidian';
+import { Editor, MarkdownView, Plugin, Modal, App } from 'obsidian';
 import ReactPlayer from 'react-player/lazy'
 
 import { VideoView, VIDEO_VIEW } from './view/VideoView';
@@ -147,6 +147,18 @@ export default class TimestampPlugin extends Plugin {
 			}
 		});
 
+		// This adds a complex command that can check whether the current state of the app allows execution of the command
+		this.addCommand({
+			id: 'open-sample-modal-complex',
+			name: 'Open sample modal (complex)',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.editor = editor;
+				new SampleModal(this.app, this.activateView.bind(this), editor).open();
+				// This command will only show up in Command Palette when the check function returns true
+				return true;
+			}
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new TimestampPluginSettingTab(this.app, this));
 	}
@@ -218,5 +230,37 @@ export default class TimestampPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+}
+
+class SampleModal extends Modal {
+	editor: Editor;
+	activateView: (url: string, editor: Editor) => void;
+	constructor(app: App, activateView: (url: string, editor: Editor) => void, editor: Editor) {
+		super(app);
+		this.activateView = activateView;
+		this.editor = editor;
+	}
+
+	onOpen() {
+		const { contentEl } = this;
+		// add an input field to contentEl
+
+		const input = contentEl.createEl('input');
+		input.setAttribute("type", "file");
+		input.onchange = (e: any) => {
+			// accept local video input and make a url from input
+			const url = URL.createObjectURL(e.target.files[0]);
+			this.activateView(url, this.editor);
+
+			// Can't get the buttons to work with local videos unfortunately
+			// this.editor.replaceSelection("\n" + "```timestamp-url \n " + url.trim() + "\n ```\n")
+			this.close();
+		}
+	}
+
+	onClose() {
+		const { contentEl } = this;
+		contentEl.empty();
 	}
 }
