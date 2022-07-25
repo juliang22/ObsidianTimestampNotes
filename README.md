@@ -13,15 +13,18 @@ This plugin solves this issue by allowing you to:
 ## Setup 
 - Download and enable the plugin
 - Set the hotkeys for
-  - opening the video player (my default is cmnd-shift-y)
-  - inserting timestamps (my default is cmnd-y)
-  - playing/pausing video (my default is cntrl-space)
+  - Opening the video player (my default is cmnd-shift-y)
+  - Opening a local video (my defauly is cmnd-shift-l)
+  - Inserting timestamps (my default is cmnd-y)
+  - Playing/pausing video (my default is cntrl-space)
+  - Seeking forward/back (my default is cntrl-arrows)
 - Set options for
-  - colors of the url, url text, timestamp button, and timestamp text
+  - Colors of the url, url text, timestamp button, and timestamp text
   - Title that is pasted when 'Open Video Player' hotkey is used
+  - How far you want to seek forward/back
 
 ## Usage
-- Highlight a video url and use the 'Open Video Player' hotkey
+- Highlight a video url and use the 'Open Video Player' hotkey or press your designated hotkey to select a local video to play (no need to highlight text for local videos)
 - Jot down notes and anytime you want to insert a timestamp, press the registered hotkey
 - Toggle pausing/playing the video by using hotkey (my default is option space)
 - Open videos at the timestamp you left off on (this is reset if plugin is disabled)
@@ -37,6 +40,7 @@ This plugin should work with:
 - mixcloud
 - dailymotion
 - twitch
+- local videos
 
 ## Demo
 
@@ -50,4 +54,3 @@ https://user-images.githubusercontent.com/39292521/167230491-f5439a62-a3f7-445c-
 
 ## Other Authors
 This plugin uses the react-player npm package: https://www.npmjs.com/package/react-player.
-
