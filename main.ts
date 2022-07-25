@@ -149,7 +149,7 @@ export default class TimestampPlugin extends Plugin {
 				const time = (hours > 0 ? leadingZero(hours) + ":" : "") + leadingZero(minutes) + ":" + leadingZero(seconds);
 
 				// insert timestamp into editor
-				editor.replaceSelection("```timestamp \n " + time + "```\n")
+				editor.replaceSelection("```timestamp \n " + time + "\n```\n")
 			}
 		});
 
