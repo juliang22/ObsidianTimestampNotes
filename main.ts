@@ -4,8 +4,6 @@ import ReactPlayer from 'react-player/lazy'
 import { VideoView, VIDEO_VIEW } from './view/VideoView';
 import { TimestampPluginSettings, TimestampPluginSettingTab, DEFAULT_SETTINGS } from 'settings';
 
-import { MarkdownRenderChild } from "obsidian";
-
 const ERRORS: { [key: string]: string } = {
 	"INVALID_URL": "\n> [!error] Invalid Video URL\n> The highlighted link is not a valid video url. Please try again with a valid link.\n",
 	"NO_ACTIVE_VIDEO": "\n> [!caution] Select Video\n> A video needs to be opened before using this hotkey.\n Highlight your video link and input your 'Open video player' hotkey to register a video.\n",
