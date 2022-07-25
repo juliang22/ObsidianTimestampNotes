@@ -50,6 +50,8 @@ https://user-images.githubusercontent.com/39292521/167230491-f5439a62-a3f7-445c-
 ## Known Issues
 1. Inserting timestamps into a bulleted section does not work. Unfortunately, code-blocks cannot be in-line with text. Make sure to press enter/insert the timestamp on a new line.
 2. If you decide to change the colors of your buttons/text, any old buttons/text will not update with the new colors until you reload the app. You can also click the '<>' when hovering over the code-block and it will refresh with the new colors.
+3. If your timestamp/video button dont work, simply switch between live-editing and viewing modes.
+4. Local videos currently cannot generate buttons. It's probably doable, but I couldn't find a way to make it work without glitching. 
 
 
 ## Other Authors
