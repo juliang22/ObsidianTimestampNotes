@@ -124,7 +124,7 @@ export default class TimestampPlugin extends Plugin {
 		this.addCommand({
 			id: 'toggle-play-pause-video',
 			name: 'Toggle play/pause video',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			callback: () => {
 				this.setPlaying(!this.player.props.playing)
 			}
 		});
@@ -133,7 +133,7 @@ export default class TimestampPlugin extends Plugin {
 		this.addCommand({
 			id: 'seek-forward',
 			name: 'Seek Forward',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			callback: () => {
 				if (this.player) this.player.seekTo(this.player.getCurrentTime() + parseInt(this.settings.forwardSeek));
 			}
 		});
@@ -142,7 +142,7 @@ export default class TimestampPlugin extends Plugin {
 		this.addCommand({
 			id: 'seek-backward',
 			name: 'Seek Backward',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			callback: () => {
 				if (this.player) this.player.seekTo(this.player.getCurrentTime() - parseInt(this.settings.backwardsSeek));
 			}
 		});
