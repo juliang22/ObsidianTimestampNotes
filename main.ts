@@ -150,7 +150,7 @@ export default class TimestampPlugin extends Plugin {
 		// Seek forward by set amount of seconds
 		this.addCommand({
 			id: 'seek-forward',
-			name: 'Seek Forward',
+			name: 'Seek forward',
 			callback: () => {
 				if (this.player) this.player.seekTo(this.player.getCurrentTime() + parseInt(this.settings.forwardSeek));
 			}
@@ -159,7 +159,7 @@ export default class TimestampPlugin extends Plugin {
 		// Seek backwards by set amount of seconds
 		this.addCommand({
 			id: 'seek-backward',
-			name: 'Seek Backward',
+			name: 'Seek backward',
 			callback: () => {
 				if (this.player) this.player.seekTo(this.player.getCurrentTime() - parseInt(this.settings.backwardsSeek));
 			}
