@@ -129,6 +129,15 @@ export default class TimestampPlugin extends Plugin {
 			}
 		});
 
+		//Command that plays the video
+		this.addCommand({
+			id: 'play-video',
+			name: 'Play video',
+			callback: () => {
+				this.setPlaying(true)
+			}
+		});
+
 		// Seek forward by set amount of seconds
 		this.addCommand({
 			id: 'seek-forward',
