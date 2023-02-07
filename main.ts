@@ -138,6 +138,15 @@ export default class TimestampPlugin extends Plugin {
 			}
 		});
 
+		//Command that pauses the video
+		this.addCommand({
+			id: 'pause-video',
+			name: 'Pause video',
+			callback: () => {
+				this.setPlaying(false)
+			}
+		});
+
 		// Seek forward by set amount of seconds
 		this.addCommand({
 			id: 'seek-forward',
