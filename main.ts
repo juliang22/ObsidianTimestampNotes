@@ -3,6 +3,7 @@ import ReactPlayer from 'react-player/lazy'
 
 import { VideoView, VIDEO_VIEW } from './view/VideoView';
 import { TimestampPluginSettings, TimestampPluginSettingTab, DEFAULT_SETTINGS } from 'settings';
+import { emitKeypressEvents } from 'readline';
 
 
 const ERRORS: { [key: string]: string } = {
@@ -14,7 +15,9 @@ export default class TimestampPlugin extends Plugin {
 	settings: TimestampPluginSettings;
 	player: ReactPlayer;
 	setPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+	setPlaybackRate: React.Dispatch<React.SetStateAction<number>>;
 	editor: Editor;
+	
 
 	async onload() {
 		// Register view
@@ -82,7 +85,7 @@ export default class TimestampPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				// Get selected text and match against video url to convert link to video video id
 				const url = editor.getSelection().trim();
-
+				
 				// Activate the view with the valid link
 				if (ReactPlayer.canPlay(url)) {
 					this.activateView(url, editor);
@@ -93,7 +96,8 @@ export default class TimestampPlugin extends Plugin {
 				} else {
 					editor.replaceSelection(ERRORS["INVALID_URL"])
 				}
-				editor.setCursor(editor.getCursor().line + 1)
+				editor.setCursor(editor.getCursor().line + 2);
+				editor.focus();
 			}
 		});
 
@@ -147,6 +151,30 @@ export default class TimestampPlugin extends Plugin {
 			}
 		});
 
+		// Increase youtube player playback speed
+		this.addCommand({
+			id: 'increase-play-speed',
+			name: 'Increase Play Speed',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (this.player) {
+					if(this.player.props.playbackRate < 2)
+					this.setPlaybackRate(this.player.props.playbackRate + 0.25);
+				}
+			}
+		});
+
+		// Decrease youtube player playback speed
+		this.addCommand({
+			id: 'decrease-play-speed',
+			name: 'Decrease Play Speed',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (this.player) {
+					if(this.player.props.playbackRate > 0.25)
+					this.setPlaybackRate(this.player.props.playbackRate - 0.25);
+				}
+			}
+		});
+
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'open-sample-modal-complex',
@@ -167,6 +195,7 @@ export default class TimestampPlugin extends Plugin {
 		this.player = null;
 		this.editor = null;
 		this.setPlaying = null;
+		this.setPlaybackRate = null;
 		this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
 	}
 
@@ -187,9 +216,10 @@ export default class TimestampPlugin extends Plugin {
 		this.app.workspace.getLeavesOfType(VIDEO_VIEW).forEach(async (leaf) => {
 			if (leaf.view instanceof VideoView) {
 
-				const setupPlayer = (player: ReactPlayer, setPlaying: React.Dispatch<React.SetStateAction<boolean>>) => {
+				const setupPlayer = (player: ReactPlayer, setPlaying: React.Dispatch<React.SetStateAction<boolean>>, setPlaybackRate: React.Dispatch<React.SetStateAction<number>>) => {
 					this.player = player;
 					this.setPlaying = setPlaying;
+					this.setPlaybackRate = setPlaybackRate;
 				}
 
 				const setupError = (err: string) => {
@@ -231,6 +261,7 @@ export default class TimestampPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
 }
 
 class SampleModal extends Modal {
@@ -261,6 +292,24 @@ class SampleModal extends Modal {
 
 	onClose() {
 		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
+
+
+class PopupModal extends Modal {
+	constructor(app: App) {
+		super(app);
+	}
+
+	onOpen() {
+		const {contentEl} = this;
+		contentEl.setText('editor has focus and it is line four.');
+	}
+
+	onClose() {
+		const {contentEl} = this;
 		contentEl.empty();
 	}
 }
