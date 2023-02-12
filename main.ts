@@ -3,8 +3,6 @@ import ReactPlayer from 'react-player/lazy'
 
 import { VideoView, VIDEO_VIEW } from './view/VideoView';
 import { TimestampPluginSettings, TimestampPluginSettingTab, DEFAULT_SETTINGS } from 'settings';
-import { emitKeypressEvents } from 'readline';
-
 
 const ERRORS: { [key: string]: string } = {
 	"INVALID_URL": "\n> [!error] Invalid Video URL\n> The highlighted link is not a valid video url. Please try again with a valid link.\n",
@@ -292,24 +290,6 @@ class SampleModal extends Modal {
 
 	onClose() {
 		const { contentEl } = this;
-		contentEl.empty();
-	}
-}
-
-
-
-class PopupModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('editor has focus and it is line four.');
-	}
-
-	onClose() {
-		const {contentEl} = this;
 		contentEl.empty();
 	}
 }
