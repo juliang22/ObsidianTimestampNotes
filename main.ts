@@ -77,8 +77,8 @@ export default class TimestampPlugin extends Plugin {
 
 		// Command that gets selected video link and sends it to view which passes it to React component
 		this.addCommand({
-			id: 'trigger-player',
-			name: 'Open video player (copy video url and use hotkey)',
+			id: 'open-online-video',
+			name: 'Open Online Video',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				// Get selected text and match against video url to convert link to video video id
 				const url = editor.getSelection().trim();
@@ -149,11 +149,11 @@ export default class TimestampPlugin extends Plugin {
 
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
+			id: 'open-local-video',
+			name: 'Open Local Video',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.editor = editor;
-				new SampleModal(this.app, this.activateView.bind(this), editor).open();
+				new OpenLocalVideoModal(this.app, this.activateView.bind(this), editor).open();
 				// This command will only show up in Command Palette when the check function returns true
 				return true;
 			}
@@ -233,7 +233,7 @@ export default class TimestampPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
+class OpenLocalVideoModal extends Modal {
 	editor: Editor;
 	activateView: (url: string, editor: Editor) => void;
 	constructor(app: App, activateView: (url: string, editor: Editor) => void, editor: Editor) {
