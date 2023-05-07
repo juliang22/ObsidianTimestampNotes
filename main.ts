@@ -322,6 +322,4 @@ class LocalVideoModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 	}
-
-
 }
