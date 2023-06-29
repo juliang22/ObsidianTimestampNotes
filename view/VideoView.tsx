@@ -32,7 +32,7 @@ export class VideoView extends ItemView {
 		return "video";
 	}
 
-	setEphemeralState({ url, setupPlayer, setupError, saveTimeOnUnload, start }: VideoViewProps) {
+	setEphemeralState({ url, main_url, setupPlayer, setupError, saveTimeOnUnload, start }: VideoViewProps) {
 
 		// Allows view to save the playback time in the setting state when the view is closed 
 		this.saveTimeOnUnload = saveTimeOnUnload;
@@ -41,6 +41,7 @@ export class VideoView extends ItemView {
 		this.root.render(
 			<VideoContainer
 				url={url}
+				main_url={main_url}
 				start={start}
 				setupPlayer={setupPlayer}
 				setupError={setupError}

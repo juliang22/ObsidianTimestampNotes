@@ -10,6 +10,7 @@ export interface TimestampPluginSettings {
 	timestampTextColor: string;
 	forwardSeek: string;
 	backwardsSeek: string;
+	port: number;
 }
 
 export const DEFAULT_SETTINGS: TimestampPluginSettings = {
@@ -20,7 +21,8 @@ export const DEFAULT_SETTINGS: TimestampPluginSettings = {
 	urlTextColor: 'white',
 	timestampTextColor: 'white',
 	forwardSeek: '10',
-	backwardsSeek: '10'
+	backwardsSeek: '10',
+	port: 12345,
 }
 
 const COLORS = { 'blue': 'blue', 'red': 'red', 'green': 'green', 'yellow': 'yellow', 'orange': 'orange', 'purple': 'purple', 'pink': 'pink', 'grey': 'grey', 'black': 'black', 'white': 'white' };
@@ -131,5 +133,20 @@ export class TimestampPluginSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}
 				));
+
+		// Customize local server port
+		new Setting(containerEl)
+			.setName('Server Port')
+			.setDesc('Select a custom port for the local server where local videos will be streamed (will be assigned randomly if left empty)')
+			.addText(number => number
+				.setPlaceholder('Enter a port number')
+				.setValue(this.plugin.settings.port.toString())
+				.onChange(async (value) => {
+					if (!isNaN(Number(value)) && Number(value) < 65500) {						
+						this.plugin.settings.port = Number(value);
+						await this.plugin.saveSettings();
+					}
+				}));
+
 	}
 }
