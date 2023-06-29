@@ -79,9 +79,9 @@ export default class TimestampPlugin extends Plugin {
 		this.addCommand({
 			id: 'trigger-player',
 			name: 'Open video player (copy video url and use hotkey)',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				// Get selected text and match against video url to convert link to video video id
-				const url = editor.getSelection().trim();
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				// Get selected text or clipboard content and match against video url to convert link to video video id
+				const url = editor.getSelection().trim() || (await navigator.clipboard.readText()).trim();
 
 				// Activate the view with the valid link
 				if (ReactPlayer.canPlay(url)) {
