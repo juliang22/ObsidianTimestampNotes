@@ -250,7 +250,7 @@ export default class TimestampPlugin extends Plugin {
 					setupPlayer,
 					setupError,
 					saveTimeOnUnload,
-					start: ~~this.settings.urlStartTimeMap.get(url)
+					start: this.settings.startAtLastPosition ? ~~this.settings.urlStartTimeMap.get(url) : 0,
 				});
 
 				await this.saveSettings();

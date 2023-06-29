@@ -11,6 +11,7 @@ export interface TimestampPluginSettings {
 	forwardSeek: string;
 	backwardsSeek: string;
 	port: number;
+	startAtLastPosition: boolean;
 }
 
 export const DEFAULT_SETTINGS: TimestampPluginSettings = {
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: TimestampPluginSettings = {
 	forwardSeek: '10',
 	backwardsSeek: '10',
 	port: 12345,
+	startAtLastPosition: true
 }
 
 const COLORS = { 'blue': 'blue', 'red': 'red', 'green': 'green', 'yellow': 'yellow', 'orange': 'orange', 'purple': 'purple', 'pink': 'pink', 'grey': 'grey', 'black': 'black', 'white': 'white' };
@@ -148,5 +150,18 @@ export class TimestampPluginSettingTab extends PluginSettingTab {
 					}
 				}));
 
+		// Toggle start at last position option
+		new Setting(containerEl)
+		.setName('Start at last position')
+		.setDesc('Open videos at the timestamp you left off on')
+		.addToggle((toggle)=>{
+			toggle
+			.setValue(this.plugin.settings.startAtLastPosition)
+			.onChange(async (value) => {
+				this.plugin.settings.startAtLastPosition = value;
+				await this.plugin.saveSettings();
+				this.display();
+			})
+		})
 	}
 }
