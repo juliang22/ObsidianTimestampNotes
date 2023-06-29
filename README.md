@@ -40,7 +40,7 @@ This plugin should work with:
 - mixcloud
 - dailymotion
 - twitch
-- local videos
+- local videos/audios
 
 ## Demo
 

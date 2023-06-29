@@ -1,4 +1,4 @@
-import { Editor, MarkdownView, Plugin, Modal, App } from 'obsidian';
+import { Editor, MarkdownView, Plugin, Modal, App, Notice } from 'obsidian';
 import ReactPlayer from 'react-player/lazy'
 
 import { VideoView, VIDEO_VIEW } from './view/VideoView';
@@ -212,6 +212,40 @@ export default class TimestampPlugin extends Plugin {
 				input.click();
 			},
 		});
+		this.addCommand({
+			id: "video-snapshot",
+			name: "Take and copy to clipboard snapshot from video",
+			callback: async () => {
+			  // https://github.com/ilkkao/capture-video-frame/blob/master/capture-video-frame.js
+			  if (!this.player) return;
+			  var video = document.querySelector("video");	  	  
+			  if (!video || video.videoHeight==0 || video.videoWidth==0) {
+				return new Notice("Current player is not supported for taking snapshot!");
+			  }
+	  
+			  var canvas = document.createElement("canvas");
+	  
+			  canvas.width = video.videoWidth;
+			  canvas.height = video.videoHeight;
+	  
+			  canvas.getContext("2d").drawImage(video, 0, 0);
+			  
+			  // https://stackoverflow.com/a/60401130
+			  canvas.toBlob(async (blob) => {
+				navigator.clipboard
+				  .write([
+					new ClipboardItem({
+					  [blob.type]: blob,
+					}),
+				  ])
+				  .then(async () => {
+					// document.execCommand("paste");
+					new Notice("Snapshot copied to clipboard!");
+				  });
+			  });
+			},
+		  });
+	  
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new TimestampPluginSettingTab(this.app, this));
