@@ -139,7 +139,7 @@ export default class TimestampPlugin extends Plugin {
 		this.addCommand({
 			id: 'pause-player',
 			name: 'Pause player',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			callback: () => {
 				this.setPlaying(!this.player.props.playing)
 			}
 		});
@@ -148,7 +148,7 @@ export default class TimestampPlugin extends Plugin {
 		this.addCommand({
 			id: 'seek-forward',
 			name: 'Seek Forward',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			callback: () => {
 				if (this.player) this.player.seekTo(this.player.getCurrentTime() + parseInt(this.settings.forwardSeek));
 			}
 		});
@@ -157,7 +157,7 @@ export default class TimestampPlugin extends Plugin {
 		this.addCommand({
 			id: 'seek-backward',
 			name: 'Seek Backward',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			callback: () => {
 				if (this.player) this.player.seekTo(this.player.getCurrentTime() - parseInt(this.settings.backwardsSeek));
 			}
 		});
@@ -194,6 +194,9 @@ export default class TimestampPlugin extends Plugin {
 			id: "add-subtitles",
 			name: "Add subtitle file",
 			callback: async () => {
+				if (!this.player) {
+					return new Notice("Player is not working right now")
+				}
 				var input = document.createElement("input");
 				input.type = "file";
 				input.accept = ".srt,.vtt";
@@ -213,6 +216,7 @@ export default class TimestampPlugin extends Plugin {
 				input.click();
 			},
 		});
+
 		this.addCommand({
 			id: "video-snapshot",
 			name: "Take and copy to clipboard snapshot from video",
@@ -262,16 +266,16 @@ export default class TimestampPlugin extends Plugin {
 
 	// This is called when a valid url is found => it activates the View which loads the React view
 	async activateView(url: string, editor: Editor) {
-		this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
-
-		await this.app.workspace.getRightLeaf(false).setViewState({
-			type: VIDEO_VIEW,
-			active: true,
-		});
-
-		this.app.workspace.revealLeaf(
-			this.app.workspace.getLeavesOfType(VIDEO_VIEW)[0]
-		);
+		// this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
+		if (this.app.workspace.getLeavesOfType(VIDEO_VIEW).length == 0) {
+			await this.app.workspace.getRightLeaf(false).setViewState({
+				type: VIDEO_VIEW,
+				active: true,
+			});
+		}
+		// this.app.workspace.revealLeaf(
+		// 	this.app.workspace.getLeavesOfType(VIDEO_VIEW)[0]
+		// );
 
 		// This triggers the React component to be loaded
 		this.app.workspace.getLeavesOfType(VIDEO_VIEW).forEach(async (leaf) => {
