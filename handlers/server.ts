@@ -5,6 +5,7 @@ import { Notice } from "obsidian";
 import * as http from "http";
 import { AddressInfo } from "node:net";
 import languageEncoding from "detect-file-encoding-and-language";
+import { biliRedirects } from "./bilibili";
 
 export var server: http.Server = undefined;
 export var PORT: number;
@@ -115,5 +116,7 @@ export function startServer(port_: any) {
       res.end(vtt);
     });
 
+    biliRedirects(app);
+    
   });
 }

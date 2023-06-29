@@ -8,6 +8,7 @@ import * as http from "http";
 import { AddressInfo } from "node:net";
 import { server, startServer, PORT, localVideoRedirect, subtitleRedirect } from "handlers/server";
 import { isLocalFile, cleanUrl, isSameVideo } from "handlers/misc";
+import { getBiliInfo, isBiliUrl } from 'handlers/bilibili';
 
 const ERRORS: { [key: string]: string } = {
 	"INVALID_URL": "\n> [!error] Invalid Video URL\n> The highlighted link is not a valid video url. Please try again with a valid link.\n",
@@ -72,7 +73,7 @@ export default class TimestampPlugin extends Plugin {
 			button.innerText = url;
 			button.style.backgroundColor = "GRAY";
 			button.style.color = this.settings.urlTextColor;
-			if (isLocalFile(url) || ReactPlayer.canPlay(url)) {
+			if (isLocalFile(url) || ReactPlayer.canPlay(url) || isBiliUrl(url)) {
 			button.style.backgroundColor = this.settings.urlColor;
 			
 			button.addEventListener("click", () => {
@@ -98,7 +99,7 @@ export default class TimestampPlugin extends Plugin {
 				const url = editor.getSelection().trim() || (await navigator.clipboard.readText()).trim();
 
 				// Activate the view with the valid link
-				if (isLocalFile(url) || ReactPlayer.canPlay(url)) {
+				if (isLocalFile(url) || ReactPlayer.canPlay(url) || isBiliUrl(url)) {
 					this.activateView(url, editor);
 					this.settings.noteTitle ?
 						editor.replaceSelection("\n" + this.settings.noteTitle + "\n" + "```timestamp-url \n " + url + "\n ```\n") :
@@ -281,6 +282,12 @@ export default class TimestampPlugin extends Plugin {
 
 				if (isLocalFile(url)) { 
 					localhost_url = localVideoRedirect(url); 
+					url = url.toString().replace(/^\"(.+)\"$/, "$1");
+
+				} else if (isBiliUrl(url)) {
+					var bili_info = await getBiliInfo(url);
+					localhost_url = bili_info.url;
+					subtitles = bili_info.subtitles;
 				}
 				else{
 					url = cleanUrl(url)
