@@ -6,7 +6,7 @@ import { TimestampPluginSettings, TimestampPluginSettingTab, DEFAULT_SETTINGS } 
 
 import * as http from "http";
 import { AddressInfo } from "node:net";
-import { server, startServer, PORT, localVideoRedirect } from "handlers/server";
+import { server, startServer, PORT, localVideoRedirect, subtitleRedirect } from "handlers/server";
 import { isLocalFile, cleanUrl, isSameVideo } from "handlers/misc";
 
 const ERRORS: { [key: string]: string } = {
@@ -189,6 +189,30 @@ export default class TimestampPlugin extends Plugin {
 			},
 		  });
 
+		this.addCommand({
+			id: "add-subtitles",
+			name: "Add subtitle file",
+			callback: async () => {
+				var input = document.createElement("input");
+				input.type = "file";
+				input.accept = ".srt,.vtt";
+				input.onchange = (e: any) => {
+				var files = e.target.files;
+				for (let i = 0; i < files.length; i++) {
+					var file = files[i];
+					var track = document.createElement("track");
+					track.kind = "subtitles";
+					track.label = file.name;
+					track.src = subtitleRedirect(file.path);
+					// track.mode = i == files.length - 1 ? "showing" : "hidden";
+					this.player.getInternalPlayer().appendChild(track);
+				}
+				};
+		
+				input.click();
+			},
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new TimestampPluginSettingTab(this.app, this));
 	}
@@ -219,6 +243,8 @@ export default class TimestampPlugin extends Plugin {
 			if (leaf.view instanceof VideoView) {
 
 				var localhost_url: string;
+				var subtitles: any[] = [];
+
 				if (isLocalFile(url)) { 
 					localhost_url = localVideoRedirect(url); 
 				}
@@ -251,6 +277,7 @@ export default class TimestampPlugin extends Plugin {
 					setupError,
 					saveTimeOnUnload,
 					start: this.settings.startAtLastPosition ? ~~this.settings.urlStartTimeMap.get(url) : 0,
+					subtitles: subtitles,
 				});
 
 				await this.saveSettings();

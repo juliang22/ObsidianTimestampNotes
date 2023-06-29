@@ -439,6 +439,11 @@ destroy@1.2.0:
   resolved "https://registry.npmjs.org/destroy/-/destroy-1.2.0.tgz"
   integrity sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==
 
+detect-file-encoding-and-language@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.npmjs.org/detect-file-encoding-and-language/-/detect-file-encoding-and-language-2.3.3.tgz"
+  integrity sha512-gRw97Yu5wP2/jOIVCjBKlF0UlumI9p/UKj+AvFNEJIwvktdUvBf1yuRtljIUoUwEM/dy0vHtrsDlaEoxXflP3Q==
+
 dir-glob@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/dir-glob/-/dir-glob-3.0.1.tgz"

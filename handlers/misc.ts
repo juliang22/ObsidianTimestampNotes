@@ -22,7 +22,6 @@ export function isLocalFile(path: fs.PathLike) {
 }
 export function isSameVideo(reactplayer: any, lastLine: string) {
   if (!reactplayer) return false;
-  console.log(reactplayer, lastLine);
 
   lastLine = lastLine.toString().replace(/^\"(.+)\"$/, "$1");
   var url = reactplayer?.props?.main_url || reactplayer?.props?.url;
@@ -34,7 +33,9 @@ export function isSameVideo(reactplayer: any, lastLine: string) {
   var player = reactplayer.getInternalPlayer();
 
   // youtube id
-  if (lastLine.includes(player.playerInfo?.videoData?.video_id)) {
+  if (player?.playerInfo) {
+    if (lastLine.includes(player.playerInfo?.videoData?.video_id)) {
+    }
     return true;
   }
 

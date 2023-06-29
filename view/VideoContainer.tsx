@@ -10,9 +10,11 @@ export interface VideoContainerProps {
 	start: number
 	setupPlayer: (player: ReactPlayer, setPlaying: React.Dispatch<React.SetStateAction<boolean>>) => void;
 	setupError: (err: string) => void;
+	subtitles: any[];
+
 }
 
-export const VideoContainer = ({ url, main_url, setupPlayer, start, setupError }: VideoContainerProps): JSX.Element => {
+export const VideoContainer = ({ url, main_url, setupPlayer, start, setupError, subtitles }: VideoContainerProps): JSX.Element => {
 	// Reference to player passed back to the setupPlayer prop
 	const playerRef = useRef<ReactPlayer>();
 
@@ -36,6 +38,18 @@ export const VideoContainer = ({ url, main_url, setupPlayer, start, setupError }
 				controls={true}
 				width='100%'
 				height='95%'
+				config={{
+					file: {
+					  // forceDASH: dash,
+					  // forceFLV: true,
+					  // forceVideo: true,
+					  // dashVersion:"4.7.0",
+					  attributes: {
+						crossOrigin: "anonymous",
+					  },
+					  tracks: subtitles,
+					},
+				  }}
 				onReady={onReady}
 				onError={(err) => setupError(err ?
 					err.message :

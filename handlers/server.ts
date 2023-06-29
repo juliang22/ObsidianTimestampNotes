@@ -4,16 +4,23 @@ import * as mime from "mime-types";
 import { Notice } from "obsidian";
 import * as http from "http";
 import { AddressInfo } from "node:net";
+import languageEncoding from "detect-file-encoding-and-language";
 
 export var server: http.Server = undefined;
 export var PORT: number;
 export var HOST = "127.0.0.1";
 
 var localVideoRoute = "localvideo";
+var subtitleRoute = "subtitles";
 
 export function localVideoRedirect(url: string) {
   url = url.toString().replace(/^\"(.+)\"$/, "$1");
   return `http://${HOST}:${PORT}/${localVideoRoute}/${url}`;
+}
+
+export function subtitleRedirect(url: string) {
+  url = url.toString().replace(/^\"(.+)\"$/, "$1");
+  return `http://${HOST}:${PORT}/${subtitleRoute}/${url}`;
 }
 
 async function checkPort(port: number) {
@@ -76,5 +83,37 @@ export function startServer(port_: any) {
       // Stream the video chunk to the client
       videoStream.pipe(res);
     });
+
+    app.get(`/${subtitleRoute}/*`, async function (req, res) {
+      var path = decodeURI(req.url.split(`/${subtitleRoute}/`)[1]).replace(/^\"(.+)\"$/, "$1");
+      var srt_ = fs.readFileSync(path);
+      var encoding = (await languageEncoding(path)).encoding;
+      let decoder = new TextDecoder(encoding); // default 'utf-8' or 'utf8'
+      var srt = decoder.decode(srt_);
+      var vtt;
+      if (path.endsWith(".srt")) {
+        // https://github.com/mafintosh/srt-to-vtt/blob/8b0e4bac28f18694e741949c50a8cbf73cd7bb6e/index.js#L9
+        vtt =
+          "WEBVTT FILE\r\n\r\n" +
+          srt
+            .replace(/\{\\([ibu])\}/g, "</$1>")
+            .replace(/\{\\([ibu])1\}/g, "<$1>")
+            .replace(/\{([ibu])\}/g, "<$1>")
+            .replace(/\{\/([ibu])\}/g, "</$1>")
+            .replace(/(\d\d:\d\d:\d\d),(\d\d\d)/g, "$1.$2")
+            .replace(/(\d\d:\d\d:\d\d\.\d\d\d --> \d\d:\d\d:\d\d\.\d\d\d)/g, "$1 align:middle line:90%") // for using with audio player
+            .concat("\r\n\r\n");
+      } else if (path.endsWith(".vtt")) {
+        vtt = srt;
+      }
+
+      const headers = {
+        "Content-Type": "text/vtt",
+        "Access-Control-Allow-Origin": "*",
+      };
+      res.writeHead(200, headers);
+      res.end(vtt);
+    });
+
   });
 }
