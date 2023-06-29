@@ -24,7 +24,7 @@ This plugin solves this issue by allowing you to:
   - How far you want to seek forward/back
 
 ## Usage
-- Highlight a video url and use the 'Open Video Player' hotkey or press your designated hotkey to select a local video to play (no need to highlight text for local videos)
+- Copy to clipboard or highlight a video url and use the 'Open Video Player' hotkey or press your designated hotkey to select a local video/audio file to play
 - Jot down notes and anytime you want to insert a timestamp, press the registered hotkey
 - Toggle pausing/playing the video by using hotkey (my default is option space)
 - Open videos at the timestamp you left off on (this is reset if plugin is disabled)
@@ -41,6 +41,7 @@ This plugin should work with:
 - dailymotion
 - twitch
 - local videos/audios
+- bilibili
 
 ## Demo
 

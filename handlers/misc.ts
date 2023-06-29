@@ -35,8 +35,19 @@ export function isSameVideo(reactplayer: any, lastLine: string) {
   // youtube id
   if (player?.playerInfo) {
     if (lastLine.includes(player.playerInfo?.videoData?.video_id)) {
+      return true;
     }
-    return true;
+  }
+
+  // bilibili id
+  var bilipattern = /(b23\.tv|bilibili\.com)\/(video\/)?(av\d{8}|bv[A-Za-z0-9}]{10}|[A-Za-z0-9]{6})/i;
+  var bili_id = url.match(bilipattern)?.pop();
+  if (bilipattern.test(url) && bilipattern.test(lastLine) && lastLine.includes(bili_id)) {
+    if (/\?p=\d+/i.test(url) && !lastLine.includes(url.match(/\?p=\d+/i)?.[0])) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   var same = false;
