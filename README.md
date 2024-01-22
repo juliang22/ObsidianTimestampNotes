@@ -1,3 +1,5 @@
+*NOTE: 1/21/24: Thank you everyone for using this plugin! Seeing the small community that has grown around this project, and the diverse ways in which you have all utilized it, is truly the highest reward I could have hoped for. I initially created this plugin while I was between jobs and heavily using Obsidian. Now that neither of those things are true, I haven’t really had the time or motivation to actively maintain and improve this project. That being said, I am also thrilled to share some exciting news regarding the future of ObsidianTimestampNotes. @mattcoleanderson has kindly offered to contribute and will being taking over as an active maintainer of this project. I'm excited to pass on the baton and looking forward to seeing where he takes this plugin!*
+
 ## Obsidian Timestamp Notes
 
 
