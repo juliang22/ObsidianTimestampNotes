@@ -4,7 +4,6 @@ import ReactPlayer from 'react-player/lazy'
 import { VideoView, VIDEO_VIEW } from './view/VideoView';
 import { TimestampPluginSettings, TimestampPluginSettingTab, DEFAULT_SETTINGS } from 'settings';
 
-
 const ERRORS: { [key: string]: string } = {
 	"INVALID_URL": "\n> [!error] Invalid Video URL\n> The highlighted link is not a valid video url. Please try again with a valid link.\n",
 	"NO_ACTIVE_VIDEO": "\n> [!caution] Select Video\n> A video needs to be opened before using this hotkey.\n Highlight your video link and input your 'Open video player' hotkey to register a video.\n",
@@ -25,6 +24,40 @@ export default class TimestampPlugin extends Plugin {
 
 		// Register settings
 		await this.loadSettings();
+
+		this.registerMarkdownPostProcessor((el, ctx) => {
+			const codeblocks = el.querySelectorAll("code");
+
+			for (let index = 0; index < codeblocks.length; index++) {
+				const codeblock = codeblocks.item(index);
+				const text = codeblock.innerText.trim();
+
+				const isTS = text.startsWith(":vts=");
+
+				if (isTS) {
+					const time = text.substr(5);
+					console.log('extracted text ' + time);
+
+					//create button for each timestamp
+					const button = el.createEl("button");
+					button.innerText = time;
+					button.style.backgroundColor = this.settings.timestampColor;
+					button.style.color = this.settings.timestampTextColor;
+					button.style.padding = "0 5px";
+					button.style.margin = "0";
+					button.style.fontSize = "inherit";
+
+					// convert timestamp to seconds and seek to that position when clicked
+					button.addEventListener("click", () => {
+						const timeArr = time.split(":").map((v) => parseInt(v));
+						const [hh, mm, ss] = timeArr.length === 2 ? [0, ...timeArr] : timeArr;
+						const seconds = (hh || 0) * 3600 + (mm || 0) * 60 + (ss || 0);
+						if (this.player) this.player.seekTo(seconds);
+					});
+					codeblock.replaceWith(button);
+				}
+			}
+		});
 
 		// Markdown processor that turns timestamps into buttons
 		this.registerMarkdownCodeBlockProcessor("timestamp", (source, el, ctx) => {
@@ -116,7 +149,29 @@ export default class TimestampPlugin extends Plugin {
 				const time = (hours > 0 ? leadingZero(hours) + ":" : "") + leadingZero(minutes) + ":" + leadingZero(seconds);
 
 				// insert timestamp into editor
-				editor.replaceSelection("```timestamp \n " + time + "\n ```\n")
+				editor.replaceSelection("```timestamp \n " + time + "\n```\n")
+			}
+		});
+
+		this.addCommand({
+			id: 'timestamp-insert-inline',
+			name: 'Insert inline timestamp based on videos current play time',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (!this.player) {
+					editor.replaceSelection(ERRORS["NO_ACTIVE_VIDEO"])
+					return
+				}
+
+				// convert current video time into timestamp
+				const leadingZero = (num: number) => num < 10 ? "0" + num.toFixed(0) : num.toFixed(0);
+				const totalSeconds = Number(this.player.getCurrentTime().toFixed(2));
+				const hours = Math.floor(totalSeconds / 3600);
+				const minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
+				const seconds = totalSeconds - (hours * 3600) - (minutes * 60);
+				const time = (hours > 0 ? leadingZero(hours) + ":" : "") + leadingZero(minutes) + ":" + leadingZero(seconds);
+
+				// insert timestamp into editor
+				editor.replaceSelection("`:vts=" + time + "`")
 			}
 		});
 
