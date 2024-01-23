@@ -14,6 +14,9 @@ This plugin solves this issue by allowing you to:
 
 ## Setup 
 - Download and enable the plugin
+- Basic Usage
+  - Online Video: copy [valid link](##Valid-Video-Players) to editor, select it, search "Open Oneline Video" in command panel, or with your hotkey.
+  - Local Video: open a markdown file, search "Open Local Video" in command pannel, or with your hotkey. (See limitation for local video at [Known Issues](##Known-Issues))
 - Set the hotkeys for
   - Opening the video player (my default is cmnd-shift-y)
   - Opening a local video (my defauly is cmnd-shift-l)
@@ -53,8 +56,6 @@ https://user-images.githubusercontent.com/39292521/167230491-f5439a62-a3f7-445c-
 1. Inserting timestamps into a bulleted section does not work. Unfortunately, code-blocks cannot be in-line with text. Make sure to press enter/insert the timestamp on a new line.
 2. If you decide to change the colors of your buttons/text, any old buttons/text will not update with the new colors until you reload the app. You can also click the '<>' when hovering over the code-block and it will refresh with the new colors.
 3. If your timestamp/video button dont work, simply switch between live-editing and viewing modes.
-4. Local videos currently cannot generate buttons. It's probably doable, but I couldn't find a way to make it work without glitching. 
-
 
 ## Other Authors
 This plugin uses the react-player npm package: https://www.npmjs.com/package/react-player.

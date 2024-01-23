@@ -22,7 +22,6 @@ export default class TimestampPlugin extends Plugin {
 			VIDEO_VIEW,
 			(leaf) => new VideoView(leaf)
 		);
-
 		// Register settings
 		await this.loadSettings();
 
@@ -77,14 +76,14 @@ export default class TimestampPlugin extends Plugin {
 
 		// Command that gets selected video link and sends it to view which passes it to React component
 		this.addCommand({
-			id: 'trigger-player',
-			name: 'Open video player (copy video url and use hotkey)',
+			id: 'open-video',
+			name: 'Open Video',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				// Get selected text and match against video url to convert link to video video id
 				const url = editor.getSelection().trim();
 
 				// Activate the view with the valid link
-				if (ReactPlayer.canPlay(url)) {
+				if (isLocalUrl(url) || ReactPlayer.canPlay(url)) {
 					this.activateView(url, editor);
 					this.settings.noteTitle ?
 						editor.replaceSelection("\n" + this.settings.noteTitle + "\n" + "```timestamp-url \n " + url + "\n ```\n") :
@@ -147,18 +146,6 @@ export default class TimestampPlugin extends Plugin {
 			}
 		});
 
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				this.editor = editor;
-				new SampleModal(this.app, this.activateView.bind(this), editor).open();
-				// This command will only show up in Command Palette when the check function returns true
-				return true;
-			}
-		});
-
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new TimestampPluginSettingTab(this.app, this));
 	}
@@ -173,6 +160,7 @@ export default class TimestampPlugin extends Plugin {
 	// This is called when a valid url is found => it activates the View which loads the React view
 	async activateView(url: string, editor: Editor) {
 		this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
+		url = isLocalUrl(url) ? url.replace("file:///", "app://local/") : url
 
 		await this.app.workspace.getRightLeaf(false).setViewState({
 			type: VIDEO_VIEW,
@@ -233,34 +221,6 @@ export default class TimestampPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	editor: Editor;
-	activateView: (url: string, editor: Editor) => void;
-	constructor(app: App, activateView: (url: string, editor: Editor) => void, editor: Editor) {
-		super(app);
-		this.activateView = activateView;
-		this.editor = editor;
-	}
-
-	onOpen() {
-		const { contentEl } = this;
-		// add an input field to contentEl
-
-		const input = contentEl.createEl('input');
-		input.setAttribute("type", "file");
-		input.onchange = (e: any) => {
-			// accept local video input and make a url from input
-			const url = URL.createObjectURL(e.target.files[0]);
-			this.activateView(url, this.editor);
-
-			// Can't get the buttons to work with local videos unfortunately
-			// this.editor.replaceSelection("\n" + "```timestamp-url \n " + url.trim() + "\n ```\n")
-			this.close();
-		}
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
+function isLocalUrl(url: string): boolean {
+	return url.startsWith("file:")
 }
