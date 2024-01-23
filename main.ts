@@ -10,6 +10,56 @@ const ERRORS: { [key: string]: string } = {
 	"NO_ACTIVE_VIDEO": "\n> [!caution] Select Video\n> A video needs to be opened before using this hotkey.\n Highlight your video link and input your 'Open video player' hotkey to register a video.\n",
 }
 
+// XXX: Displays (for me) as "Video unavailable; Watch on YouTube". If they click, rickroll.
+// but like ... "Video unavailable" is accurate ¯\_(ツ)_/¯
+const _videoNotFoundUrl = "https://www.youtube.com/watch?v=eBGIQ7ZuuiU";
+
+function _urlFromFile(file: File) {
+	if (file instanceof File) {
+		return URL.createObjectURL(file);
+	} else {
+		return _videoNotFoundUrl;
+	}
+};
+
+async function _urlFromFilePath(fpath: string): Promise<string> {
+
+	const path = require("path");
+	const normalizedFPath = path.normalize(fpath);
+
+	if (path.isAbsolute(normalizedFPath)) {
+
+		if (path.isAbsolute(normalizedFPath)) {
+				return _urlFromFile(
+					//XXX: being this direct will fail on files >2GiB and I'm not sure how to get it to behave
+					new File(
+						[await app.vault.adapter.readBinary(normalizedFPath)],
+						path.basename(normalizedFPath)
+					)
+				);
+		}
+	}
+
+	let vaultFile = app.metadataCache.getFirstLinkpathDest(fpath, app.workspace.activeEditor.file.path);
+	if (vaultFile === null) {
+		for (let f of this.app.vault.getFiles()) {
+			if (f.path.endsWith(fpath)) {
+				vaultFile = f;
+				break;
+			}
+		}
+		if (vaultFile === null) {
+			return _videoNotFoundUrl;
+		}
+	}
+
+	if (!app.metadataCache.getFileCache(vaultFile)) {
+		app.vault.readBinary(vaultFile) // kick off a read, but we don't need to await it… probably
+	}
+
+	return app.vault.getResourcePath(vaultFile)
+};
+
 export default class TimestampPlugin extends Plugin {
 	settings: TimestampPluginSettings;
 	player: ReactPlayer;
@@ -80,8 +130,13 @@ export default class TimestampPlugin extends Plugin {
 			id: 'trigger-player',
 			name: 'Open video player (copy video url and use hotkey)',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				// Get selected text and match against video url to convert link to video video id
-				const url = editor.getSelection().trim();
+
+				// can this use getLinkpath()? ; is there parsed markdown avaliable?
+				const url = editor.getSelection()
+					.trim() // remove any leading or trailing whitespace, then
+					.replace(/^!?\[{1,2}/, "") // remove any (internal or external) link-syntax front-matter
+					.replace(/^[^\]]*\]\(/, "") //if it was an external link, gobble the text, if any, and the open-paren
+					.replace(/\)$|\]$|\]]$/, "") // and any closing paren, closing square-brace(s)
 
 				// Activate the view with the valid link
 				if (ReactPlayer.canPlay(url)) {
@@ -147,13 +202,12 @@ export default class TimestampPlugin extends Plugin {
 			}
 		});
 
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
+			id: 'open-local-video',
+			name: 'Open Local Video',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.editor = editor;
-				new SampleModal(this.app, this.activateView.bind(this), editor).open();
+				new LocalVideoModal(this.app, this.activateView.bind(this), editor).open();
 				// This command will only show up in Command Palette when the check function returns true
 				return true;
 			}
@@ -171,8 +225,14 @@ export default class TimestampPlugin extends Plugin {
 	}
 
 	// This is called when a valid url is found => it activates the View which loads the React view
-	async activateView(url: string, editor: Editor) {
+	async activateView(url: string | File, editor: Editor): Promise<void> {
 		this.app.workspace.detachLeavesOfType(VIDEO_VIEW);
+
+		if (url instanceof File) {
+			return await this.activateView(_urlFromFile(url), editor);
+		} else if (!url.contains("://")) {
+			return await this.activateView(await _urlFromFilePath(url), editor);
+		}
 
 		await this.app.workspace.getRightLeaf(false).setViewState({
 			type: VIDEO_VIEW,
@@ -233,7 +293,7 @@ export default class TimestampPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
+class LocalVideoModal extends Modal {
 	editor: Editor;
 	activateView: (url: string, editor: Editor) => void;
 	constructor(app: App, activateView: (url: string, editor: Editor) => void, editor: Editor) {
@@ -249,12 +309,11 @@ class SampleModal extends Modal {
 		const input = contentEl.createEl('input');
 		input.setAttribute("type", "file");
 		input.onchange = (e: any) => {
-			// accept local video input and make a url from input
-			const url = URL.createObjectURL(e.target.files[0]);
-			this.activateView(url, this.editor);
+			const file = e.target.files[0];
+			this.activateView(file, this.editor);
 
-			// Can't get the buttons to work with local videos unfortunately
-			// this.editor.replaceSelection("\n" + "```timestamp-url \n " + url.trim() + "\n ```\n")
+
+			this.editor.replaceSelection("\n" + "```timestamp-url \n " + file.path + "\n ```\n")
 			this.close();
 		}
 	}
